@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ai_cards</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: #1e293b;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #475569;
+        }
+
+        .ai-input-section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .ai-input-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: #334155;
+        }
+
+        .ai-input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .ai-input-field {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 24px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            resize: vertical;
+            min-height: 60px;
+            background-color: #f8fafc;
+        }
+
+        .ai-input-field:focus {
+            outline: none;
+            border-color: #7c3aed;
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        .ai-submit-btn {
+            background-color: #7c3aed;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            padding: 14px 28px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+            height: fit-content;
+        }
+
+        .ai-submit-btn:hover {
+            background-color: #6d28d9;
+        }
+
+        .decks-section h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #0f172a;
+        }
+
+        .decks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .deck-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .deck-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-color: #7c3aed;
+        }
+
+        .deck-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #0f172a;
+        }
+
+        .deck-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .deck-topic {
+            background-color: #f1f5f9;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #334155;
+        }
+
+        .deck-count {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .deck-count::before {
+            content: "📋";
+            font-size: 0.9rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #94a3b8;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: #475569;
+        }
+
+        .study-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .study-header h2 {
+            font-size: 1.5rem;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .study-header .card-counter {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .flashcard {
+            background-color: #f8fafc;
+            border-radius: 16px;
+            padding: 32px 24px;
+            margin-bottom: 24px;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e2e8f0;
+        }
+
+        .flashcard:hover {
+            transform: scale(1.02);
+        }
+
+        .flashcard .title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 12px;
+        }
+
+        .flashcard .task {
+            font-size: 1.1rem;
+            color: #334155;
+            margin-bottom: 20px;
+        }
+
+        .flashcard .answer {
+            font-size: 1.2rem;
+            color: #7c3aed;
+            font-weight: 500;
+            padding-top: 16px;
+            border-top: 2px dashed #cbd5e1;
+            width: 100%;
+        }
+
+        .flashcard .hint {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 12px;
+        }
+
+        .flashcard .variants {
+            text-align: left;
+            width: 100%;
+            background-color: white;
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 12px;
+        }
+
+        .flashcard .variants p {
+            padding: 8px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .flashcard .correct-answer {
+            background-color: #dcfce7;
+            color: #166534;
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin-top: 12px;
+        }
+
+        .next-btn {
+            background-color: #7c3aed;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 14px 32px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: fit-content;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .next-btn:hover {
+            background-color: #6d28d9;
+            transform: translateX(2px);
+        }
+
+        .next-btn:disabled {
+            background-color: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <div class="header">
+            <h1>ai_cards</h1>
+            <p>Создавайте карточки для обучения с ChatGPT</p>
+        </div>
+
+        
+        <div class="ai-input-section">
+            <label class="ai-input-label">Введите тему для генерации колоды карточек:</label>
+            <div class="ai-input-wrapper">
+                <textarea 
+                    class="ai-input-field" 
+                    placeholder="Например: 'Создай колоду по физике для 9 класса' и т.д."
+                    rows="2"
+                ></textarea>
+                <button class="ai-submit-btn">Создать колоду</button>
+            </div>
+        </div>
+
+        <div class="decks-section">
+            <h2>Ваши колоды</h2>
+            <div class="decks-grid" id="decksGrid">
+                <div class="deck-card" data-deck="physics">
+                    <div class="deck-title">Физика</div>
+                    <div class="deck-meta">
+                        <span class="deck-count" id="deckCounter">16 карточек</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="studyModal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeModal">&times;</span>
+            
+            <div class="study-header">
+                <h2 id="deckTitle">Физика</h2>
+                <div class="card-counter" id="cardCounter">Карточка 1/16</div>
+            </div>
+
+            <div class="flashcard" id="flashcard">
+                <div id="cardFront">
+                </div>
+                <div id="cardBack" class="hidden">
+                </div>
+                <div class="hint">Нажмите на карточку, чтобы перевернуть</div>
+            </div>
+            <button class="next-btn" id="nextCardBtn">Следующая карточка →</button>
+        </div>
+    </div>
+
+    <script>
+        const physicsDeck = [
+            // TextAnswerCard
+            { type: 'text', title: 'Кинетическая энергия', task: 'Определите формулу для расчёта кинетической энергии тела.', answer: 'E_k = 0.5 * m * v^2' },
+            { type: 'text', title: 'Первый закон Ньютона', task: 'Опишите первый закон Ньютона.', answer: 'Тело сохраняет состояние покоя или равномерного прямолинейного движения, если на него не действует внешняя сила.' },
+            { type: 'text', title: 'Закон Архимеда', task: 'Что показывает закон Архимеда?', answer: 'На тело в жидкости действует выталкивающая сила, равная весу вытесненной жидкости.' },
+            { type: 'text', title: 'Основные характеристики волны', task: 'Назовите основные характеристики волны.', answer: 'Длина волны, частота, период, амплитуда.' },
+            
+            // SingleChoiceCard
+            { type: 'single', title: 'Закон Инерции', task: 'Какой закон описывает принцип инерции?', variants: ['Закон Сохранения Импульса', 'Первый Закон Ньютона', 'Третий Закон Кеплера', 'Закон Ома'], correct: 1 },
+            { type: 'single', title: 'Вторая Космическая Скорость', task: 'Как называется величина, равная массе на ускорение?', variants: ['Энергия', 'Момент', 'Сила', 'Давление'], correct: 2 },
+            
+            // MultipleChoiceCard
+            { type: 'multiple', title: 'Основы законов Ньютона', task: 'Выберите все верные утверждения о законах Ньютона:', variants: ['Первый закон объясняет инерцию', 'Второй закон связывает силу, массу и ускорение', 'Третий закон о действии и противодействии', 'Законы применимы только на квантовом уровне'], correct: [0, 1, 2] },
+            { type: 'multiple', title: 'Полная механическая энергия', task: 'Какие формы энергии входят в полную механическую энергию?', variants: ['Кинетическая', 'Тепловая', 'Потенциальная', 'Ядерная'], correct: [0, 2] },
+            
+            // BinaryChoiceCard
+            { type: 'binary', title: 'Рассеяние света', task: 'Свет может рассеиваться в различных направлениях?', answer: true },
+            { type: 'binary', title: 'Передача звука', task: 'Звук может распространяться в вакууме?', answer: false },
+            { type: 'binary', title: 'Энергия и высота', task: 'Уменьшается ли потенциальная энергия при подъёме тела?', answer: false },
+            { type: 'binary', title: 'Масса и заряд', task: 'Масса — это электрический заряд?', answer: false },
+            
+            // MissingWordCard
+            { type: 'missing', title: 'Область изучения', task: 'Что изучает наука физика?', answer: 'Явления' },
+            { type: 'missing', title: 'Сила трения', task: 'Как называется сила, препятствующая движению?', answer: 'Трение' },
+            { type: 'missing', title: 'Энергия в батарейке', task: 'Какая энергия превращается в электрическую в батарейке?', answer: 'Химическая' },
+            { type: 'missing', title: 'Измерение тока', task: 'Прибор для измерения силы тока?', answer: 'Амперметр' }
+        ];
+
+        document.getElementById('deckCounter').textContent = `${physicsDeck.length} карточек`;
+
+        let currentCardIndex = 0;
+        let showingAnswer = false;
+
+        const modal = document.getElementById('studyModal');
+        const closeBtn = document.getElementById('closeModal');
+        const deckCards = document.querySelectorAll('.deck-card[data-deck]');
+        const flashcard = document.getElementById('flashcard');
+        const cardFront = document.getElementById('cardFront');
+        const cardBack = document.getElementById('cardBack');
+        const cardCounter = document.getElementById('cardCounter');
+        const nextBtn = document.getElementById('nextCardBtn');
+
+        deckCards.forEach(card => {
+            card.addEventListener('click', () => {
+                currentCardIndex = 0;
+                showingAnswer = false;
+                renderCard(currentCardIndex);
+                modal.classList.add('active');
+            });
+        });
+
+        closeBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+
+        flashcard.addEventListener('click', () => {
+            showingAnswer = !showingAnswer;
+            if (showingAnswer) {
+                cardFront.classList.add('hidden');
+                cardBack.classList.remove('hidden');
+            } else {
+                cardFront.classList.remove('hidden');
+                cardBack.classList.add('hidden');
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentCardIndex < physicsDeck.length - 1) {
+                currentCardIndex++;
+                showingAnswer = false;
+                renderCard(currentCardIndex);
+            }
+        });
+
+        function renderCard(index) {
+            const card = physicsDeck[index];
+            cardFront.classList.remove('hidden');
+            cardBack.classList.add('hidden');
+            
+            cardCounter.textContent = `Карточка ${index + 1}/${physicsDeck.length}`;
+            
+            nextBtn.disabled = index === physicsDeck.length - 1;
+
+            let frontHtml = `<div class="title">${card.title}</div>`;
+            frontHtml += `<div class="task">${card.task}</div>`;
+            
+            if (card.type === 'single' || card.type === 'multiple') {
+                frontHtml += '<div class="variants">';
+                card.variants.forEach((v, i) => {
+                    frontHtml += `<p>${i + 1}. ${v}</p>`;
+                });
+                frontHtml += '</div>';
+            }
+            
+            cardFront.innerHTML = frontHtml;
+
+            let backHtml = `<div class="title">${card.title}</div>`;
+            backHtml += `<div class="answer">`;
+            
+            switch(card.type) {
+                case 'text':
+                case 'missing':
+                    backHtml += `${card.answer}`;
+                    break;
+                case 'single':
+                    backHtml += `✅ Правильный ответ: ${card.variants[card.correct]}`;
+                    break;
+                case 'multiple':
+                    backHtml += `✅ Правильные ответы:<br>`;
+                    card.correct.forEach(i => {
+                        backHtml += `• ${card.variants[i]}<br>`;
+                    });
+                    break;
+                case 'binary':
+                    backHtml += card.answer ? '✅ Да, верно' : '❌ Нет, неверно';
+                    break;
+                default:
+                    backHtml += card.answer;
+            }
+            
+            backHtml += '</div>';
+            cardBack.innerHTML = backHtml;
+        }
+    </script>
+</body>
+</html>
