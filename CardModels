@@ -1,0 +1,160 @@
+export class Card {
+    constructor(data) {
+        this.id = data.id || this.generateId();
+        this.type = data.type;
+        this.title = data.title;
+        this.task = data.task;
+        this.state = data.state || 'CollectAnswer';
+        this.userAnswer = null;
+        this.isCorrect = null;
+    }
+
+    generateId() {
+        return Date.now() + Math.random().toString(36).slice(2, 9);
+    }
+
+    checkAnswer() {
+        throw new Error('Method checkAnswer must be implemented in child class');
+    }
+
+    reset() {
+        this.userAnswer = null;
+        this.isCorrect = null;
+        this.state = 'CollectAnswer';
+    }
+}
+
+import { Card } from './Card.js';
+
+export class TextAnswerCard extends Card {
+    constructor(data) {
+        super({ ...data, type: 'text' });
+        this.correctAnswer = data.answer;
+    }
+
+    checkAnswer() {
+        if (!this.userAnswer) return false;
+        
+        const normalizedUser = this.userAnswer.toLowerCase().trim();
+        const normalizedCorrect = this.correctAnswer.toLowerCase().trim();
+        
+        this.isCorrect = normalizedUser === normalizedCorrect;
+        this.state = this.isCorrect ? 'Finished' : 'AnswerChecked';
+        return this.isCorrect;
+    }
+}
+
+import { Card } from './Card.js';
+
+export class SingleChoiceCard extends Card {
+    constructor(data) {
+        super({ ...data, type: 'single' });
+        this.variants = data.answerVariants || data.variants;
+        this.correctIndex = data.answer; 
+        this.userSelection = null;
+    }
+
+    checkAnswer() {
+        if (this.userSelection === null) return false;
+        
+        this.isCorrect = this.userSelection === this.correctIndex;
+        this.state = this.isCorrect ? 'Finished' : 'AnswerChecked';
+        return this.isCorrect;
+    }
+
+    selectAnswer(index) {
+        if (this.state !== 'CollectAnswer') return;
+        this.userSelection = index;
+        this.userAnswer = index;
+    }
+}
+
+import { Card } from './Card.js';
+
+export class MultipleChoiceCard extends Card {
+    constructor(data) {
+        super({ ...data, type: 'multiple' });
+        this.variants = data.answerVariants || data.variants;
+        this.correctIndices = data.answer; 
+        this.userSelections = [];
+    }
+
+    checkAnswer() {
+        if (this.userSelections.length === 0) return false;
+        
+        const sortedUser = [...this.userSelections].sort();
+        const sortedCorrect = [...this.correctIndices].sort();
+        
+        this.isCorrect = JSON.stringify(sortedUser) === JSON.stringify(sortedCorrect);
+        this.state = this.isCorrect ? 'Finished' : 'AnswerChecked';
+        return this.isCorrect;
+    }
+
+    toggleSelection(index) {
+        if (this.state !== 'CollectAnswer') return;
+        
+        const position = this.userSelections.indexOf(index);
+        if (position === -1) {
+            this.userSelections.push(index);
+        } else {
+            this.userSelections.splice(position, 1);
+        }
+        this.userAnswer = [...this.userSelections];
+    }
+}
+
+import { Card } from './Card.js';
+
+export class BinaryChoiceCard extends Card {
+    constructor(data) {
+        super({ ...data, type: 'binary' });
+        this.correctAnswer = data.answer;
+        this.userSelection = null;
+    }
+
+    checkAnswer() {
+        if (this.userSelection === null) return false;
+        
+        this.isCorrect = this.userSelection === this.correctAnswer;
+        this.state = this.isCorrect ? 'Finished' : 'AnswerChecked';
+        return this.isCorrect;
+    }
+
+    selectAnswer(value) {
+        if (this.state !== 'CollectAnswer') return;
+        this.userSelection = value;
+        this.userAnswer = value;
+    }
+}
+
+import { Card } from './Card.js';
+
+export class MissingWordCard extends Card {
+    constructor(data) {
+        super({ ...data, type: 'missing' });
+        this.correctAnswer = data.answer;
+        this.parseTask();
+    }
+
+    parseTask() {
+        const parts = this.task.split('___');
+        this.beforeGap = parts[0] || '';
+        this.afterGap = parts[1] || '';
+    }
+
+    checkAnswer() {
+        if (!this.userAnswer) return false;
+        
+        const normalizedUser = this.userAnswer.toLowerCase().trim();
+        const normalizedCorrect = this.correctAnswer.toLowerCase().trim();
+        
+        this.isCorrect = normalizedUser === normalizedCorrect;
+        this.state = this.isCorrect ? 'Finished' : 'AnswerChecked';
+        return this.isCorrect;
+    }
+
+    setGapAnswer(text) {
+        if (this.state !== 'CollectAnswer') return;
+        this.userAnswer = text;
+    }
+}
