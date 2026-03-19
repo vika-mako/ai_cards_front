@@ -23,7 +23,6 @@ export class CardsController {
 
     try {
       const rawCards = await this.repository.queryCards(spec);
-      console.log(rawCards);
       const uiCards = mapRawCardsToUiCards(rawCards);
 
       this.store.setState({
@@ -55,7 +54,7 @@ export class CardsController {
 
   showAnswer() {
     const card = this.currentCard;
-    if (!card || card.type !== "text") return;
+    if (!card || card.type !== "TextAnswerCard") return;
 
     card.revealAnswer();
     this.store.emit();
@@ -63,7 +62,7 @@ export class CardsController {
 
   hideAnswer() {
     const card = this.currentCard;
-    if (!card || card.type !== "text") return;
+    if (!card || card.type !== "TextAnswerCard") return;
 
     card.hideAnswer();
     this.store.emit();
@@ -71,7 +70,7 @@ export class CardsController {
 
   selectSingle(index) {
     const card = this.currentCard;
-    if (!card || card.type !== "single") return;
+    if (!card || card.type !== "SingleChoiceCard") return;
 
     card.select(index);
     this.store.emit();
@@ -79,7 +78,7 @@ export class CardsController {
 
   toggleMultiple(index) {
     const card = this.currentCard;
-    if (!card || card.type !== "multiple") return;
+    if (!card || card.type !== "MultipleChoiceCard") return;
 
     card.toggle(index);
     this.store.emit();
@@ -87,7 +86,7 @@ export class CardsController {
 
   selectBinary(value) {
     const card = this.currentCard;
-    if (!card || card.type !== "binary") return;
+    if (!card || card.type !== "BinaryChoiceCard") return;
 
     card.select(value);
     this.store.emit();

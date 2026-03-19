@@ -23,7 +23,7 @@ export const CardUiState = {
   
   export class TextAnswerCardUiModel extends BaseCardUiModel {
     constructor({ id, title, task, answer }) {
-      super({ id, type: "text", title, task });
+      super({ id, type: "TextAnswerCard", title, task });
       this.answer = answer;
       this.isAnswerVisible = false;
     }
@@ -46,7 +46,7 @@ export const CardUiState = {
   
   export class SingleChoiceCardUiModel extends BaseCardUiModel {
     constructor({ id, title, task, answerVariants, answer }) {
-      super({ id, type: "single", title, task });
+      super({ id, type: "SingleChoiceCard", title, task });
       this.answerVariants = [...answerVariants];
       this.answer = Number(answer);
       this.userSelection = null;
