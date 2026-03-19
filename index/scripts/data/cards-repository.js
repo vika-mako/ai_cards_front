@@ -4,7 +4,7 @@ export class CardsRepository {
     }
   
     async queryCards(spec = {}) {
-      const response = await fetch(`${this.baseUrl}/cards/query`, {
+      const response = await fetch(`${this.baseUrl}/v1/requestCards`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

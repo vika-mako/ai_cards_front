@@ -23,6 +23,7 @@ export class CardsController {
 
     try {
       const rawCards = await this.repository.queryCards(spec);
+      console.log(rawCards);
       const uiCards = mapRawCardsToUiCards(rawCards);
 
       this.store.setState({

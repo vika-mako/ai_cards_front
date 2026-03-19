@@ -1,56 +1,12 @@
 import {
     TextAnswerCardUiModel,
     SingleChoiceCardUiModel,
-    MultipleChoiceCardUiModel,
-    BinaryChoiceCardUiModel,
+    //MultipleChoiceCardUiModel,
+    //BinaryChoiceCardUiModel,
   } from "../models/card-ui.models.js";
   
-  function normalizeExplicitType(raw) {
-    const explicitType = raw.kind || raw.type || raw.cardType || raw.__type || raw.className;
-  
-    switch (explicitType) {
-      case "TextAnswerCard":
-      case "text":
-        return "text";
-  
-      case "SingleChoiceCard":
-      case "single":
-        return "single";
-  
-      case "MultipleChoiceCard":
-      case "multiple":
-        return "multiple";
-  
-      case "BinaryChoiceCard":
-      case "binary":
-        return "binary";
-  
-      default:
-        return null;
-    }
-  }
-  
   export function detectCardType(rawCard) {
-    const explicitType = normalizeExplicitType(rawCard);
-    if (explicitType) return explicitType;
-  
-    if (Array.isArray(rawCard.answerVariants) && Array.isArray(rawCard.answer)) {
-      return "multiple";
-    }
-  
-    if (Array.isArray(rawCard.answerVariants) && typeof rawCard.answer === "number") {
-      return "single";
-    }
-  
-    if (typeof rawCard.answer === "boolean") {
-      return "binary";
-    }
-  
-    if (typeof rawCard.answer === "string") {
-      return "text";
-    }
-  
-    throw new Error(`Cannot detect card type for payload: ${JSON.stringify(rawCard)}`);
+    return rawCard.type;
   }
   
   export function mapRawCardToUiCard(rawCard, index = 0) {
@@ -58,7 +14,7 @@ import {
     const type = detectCardType(rawCard);
   
     switch (type) {
-      case "text":
+      case "TextAnswerCard":
         return new TextAnswerCardUiModel({
           id,
           title: rawCard.title,
@@ -66,7 +22,7 @@ import {
           answer: rawCard.answer,
         });
   
-      case "single":
+      case "SingleChoiceCard":
         return new SingleChoiceCardUiModel({
           id,
           title: rawCard.title,
@@ -75,7 +31,7 @@ import {
           answer: rawCard.answer,
         });
   
-      case "multiple":
+      case "MultipleChoiceCard":
         return new MultipleChoiceCardUiModel({
           id,
           title: rawCard.title,
@@ -84,7 +40,7 @@ import {
           answer: rawCard.answer,
         });
   
-      case "binary":
+      case "BinaryChoiceCard":
         return new BinaryChoiceCardUiModel({
           id,
           title: rawCard.title,

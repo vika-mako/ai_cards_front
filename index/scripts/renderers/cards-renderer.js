@@ -1,4 +1,4 @@
-import { renderCardsPage } from "../../layout/card-templates.js";
+import { renderCardsPage } from "../layout/card-templates.js";
 
 export class CardsRenderer {
   constructor(rootElement) {
