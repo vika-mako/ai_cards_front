@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ai_cards - Изучение с нейросетью</title>
+    <link rel="stylesheet" href="/index/styles.css">
+</head>
+<body>
+    <main class="page">
+        <div id="app"></div>
+    </main>
+
+    <div class="container">
+        <div class="header">
+            <h1>ai_cards</h1>
+            <p>Создавайте колоды для изучения с помощью нейросети</p>
+        </div>
+
+        <div class="ai-input-section">
+            <label class="ai-input-label" for="aiPrompt">
+                Напишите тему, которую хотите изучить:
+            </label>
+
+            <div class="ai-input-wrapper">
+                <textarea
+                    class="ai-input-field"
+                    placeholder="Например: 'Создай колоду по физике для 9 класса'"
+                    rows="2"
+                    id="aiPrompt"
+                >Физика</textarea>
+
+                <button class="ai-submit-btn" id="createDeckBtn">
+                    Создать колоду
+                </button>
+            </div>
+        </div>
+
+        <div class="decks-section">
+            <h2>Ваши колоды</h2>
+            <div class="decks-grid" id="decksGrid"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="studyModal">
+        <div class="modal-content">
+            <button class="close-btn" id="closeModal" type="button">&times;</button>
+
+            <div class="study-header">
+                <h2 id="deckTitle">Физика</h2>
+                <div class="card-counter" id="cardCounter"></div>
+            </div>
+
+            <div id="flashcardContainer"></div>
+
+            <button class="next-btn" id="nextCardBtn" type="button">
+                Следующая карточка →
+            </button>
+        </div>
+    </div>
+
+    <script type="module" src="/index/app.js"></script>
+</body>
+</html>
