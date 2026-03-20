@@ -440,6 +440,11 @@ export function initCardsPage(container, state) {
     throw new Error("State не передан в initCardsPage");
   }
 
+  // удалить предыдущий экземпляр, если он уже был
+  if (typeof container.__cardsPageDestroy === "function") {
+    container.__cardsPageDestroy();
+  }
+
   state.status = state.status ?? "ready";
   state.currentIndex = state.currentIndex ?? 0;
   state.cards = prepareCards(state.cards ?? []);
@@ -534,14 +539,22 @@ export function initCardsPage(container, state) {
   container.addEventListener("click", onClick);
   container.addEventListener("input", onInput);
 
+  function destroy() {
+    container.removeEventListener("click", onClick);
+    container.removeEventListener("input", onInput);
+
+    if (container.__cardsPageDestroy === destroy) {
+      delete container.__cardsPageDestroy;
+    }
+  }
+
+  container.__cardsPageDestroy = destroy;
+
   render();
 
   return {
     state,
     render,
-    destroy() {
-      container.removeEventListener("click", onClick);
-      container.removeEventListener("input", onInput);
-    },
+    destroy,
   };
 }

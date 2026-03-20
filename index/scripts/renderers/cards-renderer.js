@@ -1,4 +1,4 @@
-import { renderCardsPage } from "../layout/card-templates.js";
+import { initCardsPage } from "../layout/card-templates.js";
 
 export class CardsRenderer {
   constructor(rootElement) {
@@ -18,6 +18,11 @@ export class CardsRenderer {
   }
 
   render(state) {
-    this.rootElement.innerHTML = renderCardsPage(state);
+    const studyModal = document.getElementById("studyModal");
+    const container = document.getElementById("flashcardContainer");
+
+    studyModal.classList.add("active");
+    
+    initCardsPage(container, state);
   }
 }
